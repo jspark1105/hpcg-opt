@@ -115,9 +115,13 @@ int main(int argc, char * argv[]) {
   InitializeSparseMatrix(A, geom);
 
   Vector b, x, xexact;
-  GenerateProblem(A, &b, &x, &xexact);
+  if (params.read_from_file)
+	GenerateProblem_file(A, &b, &x, &xexact, params.filename);
+  else 
+    GenerateProblem(A, &b, &x, &xexact);
+  
   SetupHalo(A);
-  int numberOfMgLevels = 4; // Number of levels including first
+  int numberOfMgLevels = 1; // Number of levels including first
   SparseMatrix * curLevelMatrix = &A;
   for (int level = 1; level< numberOfMgLevels; ++level) {
 	  GenerateCoarseProblem(*curLevelMatrix);
@@ -127,8 +131,9 @@ int main(int argc, char * argv[]) {
 
   CGData data;
   InitializeSparseCGData(A, data);
-
-
+  
+  
+  
   // Use this array for collecting timing information
   std::vector< double > times(9,0.0);
 
@@ -153,7 +158,7 @@ int main(int argc, char * argv[]) {
 #endif
   TestCGData testcg_data;
   testcg_data.count_pass = testcg_data.count_fail = 0;
-  TestCG(A, data, b, x, testcg_data);
+//  TestCG(A, data, b, x, testcg_data);
 
   TestSymmetryData testsymmetry_data;
   TestSymmetry(A, b, xexact, testsymmetry_data);
@@ -217,6 +222,7 @@ int main(int argc, char * argv[]) {
   std::vector< double > ref_times(9,0.0);
   double tolerance = 0.0; // Set tolerance to zero to make all runs do maxIters iterations
   int err_count = 0;
+  
   for (int i=0; i< numberOfCalls; ++i) {
     ZeroVector(x);
     ierr = CG_ref( A, data, b, x, refMaxIters, tolerance, niters, normr, normr0, &ref_times[0], true);
@@ -224,8 +230,8 @@ int main(int argc, char * argv[]) {
     totalNiters_ref += niters;
   }
   if (rank == 0 && err_count) HPCG_fout << err_count << " error(s) in call(s) to reference CG." << endl;
+  
   double refTolerance = normr / normr0;
-
   //////////////////////////////
   // Optimized CG Setup Phase //
   //////////////////////////////
@@ -256,7 +262,7 @@ int main(int argc, char * argv[]) {
     double current_time = opt_times[0] - last_cummulative_time;
     if (current_time > opt_worst_time) opt_worst_time = current_time;
   }
-
+  return 0;
 #ifndef HPCG_NOMPI
 // Get the absolute worst time across all MPI ranks (time in CG can be different)
   double local_opt_worst_time = opt_worst_time;

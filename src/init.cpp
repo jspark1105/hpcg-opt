@@ -70,17 +70,29 @@ HPCG_Init(int * argc_p, char ** *argv_p, HPCG_Params & params) {
   /* for sequential and some MPI implementations it's OK to read first three args */
   for (i = 0; i < 3; ++i)
     if (argc <= i+1 || sscanf(argv[i+1], "%d", iparams+i) != 1 || iparams[i] < 10) iparams[i] = 0;
-
-  /* for some MPI environments, command line arguments may get complicated so we need a prefix */
-  for (i = 1; i <= argc && argv[i]; ++i)
-    for (j = 0; j < 3; ++j)
-      if (startswith(argv[i], cparams[j]))
-        if (sscanf(argv[i]+strlen(cparams[j]), "%d", iparams+j) != 1 || iparams[j] < 10) iparams[j] = 0;
-
-  if (! iparams[0] && ! iparams[1] && ! iparams[2]) { /* no geometry arguments on the command line */
-    ReadHpcgDat(iparams, iparams+3);
+  
+  if (argc >= 5) {
+	int threadNum = 0;
+	sscanf(argv[4], "%d", &threadNum);
+    omp_set_num_threads(threadNum);
   }
 
+  if (argc >= 6) {
+    params.read_from_file = true;
+	strcpy(params.filename, argv[5]);
+  }
+
+  /* for some MPI environments, command line arguments may get complicated so we need a prefix */
+  // XXX   YXY 
+//  for (i = 1; i <= argc && argv[i]; ++i)
+//    for (j = 0; j < 3; ++j)
+//      if (startswith(argv[i], cparams[j]))
+//        if (sscanf(argv[i]+strlen(cparams[j]), "%d", iparams+j) != 1 || iparams[j] < 10) iparams[j] = 0;
+//
+//  if (! iparams[0] && ! iparams[1] && ! iparams[2]) { /* no geometry arguments on the command line */
+//    ReadHpcgDat(iparams, iparams+3);
+//  }
+  
   for (i = 0; i < 3; ++i) {
     if (iparams[i] < 16)
       for (j = 1; j <= 2; ++j)
@@ -114,7 +126,7 @@ HPCG_Init(int * argc_p, char ** *argv_p, HPCG_Params & params) {
   #pragma omp parallel
   params.numThreads = omp_get_num_threads();
 #endif
-
+  printf("thread cnt = %d\n", params.numThreads);
   time ( &rawtime );
   ptm = localtime(&rawtime);
   sprintf( fname, "hpcg_log_%04d.%02d.%02d.%02d.%02d.%02d.txt",

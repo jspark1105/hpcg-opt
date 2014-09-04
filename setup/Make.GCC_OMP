@@ -91,8 +91,9 @@ MPlib        =
 # - HPCG includes / libraries / specifics -------------------------------
 # ----------------------------------------------------------------------
 #
-HPCG_INCLUDES = -I$(INCdir) -I$(INCdir)/$(arch) $(MPinc)
-HPCG_LIBS     = 
+HPCG_INCLUDES = -I$(INCdir) -I$(INCdir)/$(arch) $(MPinc) -I../Graphite-graph/common/user
+HPCG_LIBS     = -lm -pthread -lcarbon_sim -lboost_filesystem-mt -lboost_system-mt -lrt -ldsent_contrib -lmcpat  -ldb_utils -ldb
+
 #
 # - Compile time options -----------------------------------------------
 #
@@ -116,12 +117,11 @@ HPCG_DEFS     = $(HPCG_OPTS) $(HPCG_INCLUDES)
 # - Compilers / linkers - Optimization flags ---------------------------
 # ----------------------------------------------------------------------
 #
-CXX          = /usr/bin/g++
-CXXFLAGS     = $(HPCG_DEFS) -O3 -ffast-math -ftree-vectorize -ftree-vectorizer-verbose=0 -fopenmp
+CXX          = g++
+CXXFLAGS     = $(HPCG_DEFS) -O3 -ffast-math -ftree-vectorize -ftree-vectorizer-verbose=0 -fopenmp 
 #
 LINKER       = $(CXX)
-LINKFLAGS    = $(CXXFLAGS)
-#
+LINKFLAGS    = $(CXXFLAGS) -L../Graphite-graph/lib/ -L../Graphite-graph/contrib/dsent/ -L../Graphite-graph/contrib/mcpat/ -L../Graphite-graph/contrib/db_utils/
 ARCHIVER     = ar
 ARFLAGS      = r
 RANLIB       = echo

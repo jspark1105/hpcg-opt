@@ -36,10 +36,13 @@ struct SparseMatrix_STRUCT {
   local_int_t localNumberOfRows; //!< number of rows local to this process
   local_int_t localNumberOfColumns;  //!< number of columns local to this process
   local_int_t localNumberOfNonzeros;  //!< number of nonzeros local to this process
-  char  * nonzerosInRow;  //!< The number of nonzeros in a row will always be 27 or fewer
+  int  * nonzerosInRow;  //!< The number of nonzeros in a row will always be 27 or fewer
   global_int_t ** mtxIndG; //!< matrix indices as global values
   local_int_t ** mtxIndL; //!< matrix indices as local values
   double ** matrixValues; //!< values of matrix entries
+  double * _values;
+  global_int_t * _mtxIndG;
+  local_int_t * _mtxIndL;
   double ** matrixDiagonal; //!< values of matrix diagonal entries
   std::map< global_int_t, local_int_t > globalToLocalMap; //!< global-to-local mapping
   std::vector< global_int_t > localToGlobalMap; //!< local-to-global mapping

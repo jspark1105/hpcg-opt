@@ -52,7 +52,7 @@ void SetupHalo(SparseMatrix & A) {
   // Extract Matrix pieces
 
   local_int_t localNumberOfRows = A.localNumberOfRows;
-  char  * nonzerosInRow = A.nonzerosInRow;
+  int * nonzerosInRow = A.nonzerosInRow;
   global_int_t ** mtxIndG = A.mtxIndG;
   local_int_t ** mtxIndL = A.mtxIndL;
 

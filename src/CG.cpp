@@ -30,7 +30,7 @@
 #include "ComputeMG.hpp"
 #include "ComputeDotProduct.hpp"
 #include "ComputeWAXPBY.hpp"
-
+#include "carbon_user.h"
 
 // Use TICK and TOCK to time a code section in MATLAB-like fashion
 #define TICK()  t0 = mytimer() //!< record current time in 't0'
@@ -96,14 +96,20 @@ int CG(const SparseMatrix & A, CGData & data, const Vector & b, Vector & x,
   normr0 = normr;
 
   // Start iterations
-
   for (int k=1; k<=max_iter && normr/normr0 > tolerance; k++ ) {
-    TICK();
+	printf("k = %d\n", k);
+//	if (k == 3)
+//      CarbonEnableModels();
+//	if (k == 4) {
+//	  CarbonDisableModels();
+//      return 0;
+//	}
+    //TICK();
     if (doPreconditioning)
       ComputeMG(A, r, z); // Apply preconditioner
     else
       CopyVector (r, z); // copy r to z (no preconditioning)
-    TOCK(t5); // Preconditioner apply time
+    //TOCK(t5); // Preconditioner apply time
 
     if (k == 1) {
       TICK(); ComputeWAXPBY(nrow, 1.0, z, 0.0, z, p, A.isWaxpbyOptimized); TOCK(t2); // Copy Mr to p
@@ -115,7 +121,13 @@ int CG(const SparseMatrix & A, CGData & data, const Vector & b, Vector & x,
       TICK(); ComputeWAXPBY (nrow, 1.0, z, beta, p, p, A.isWaxpbyOptimized);  TOCK(t2); // p = beta*p + z
     }
 
-    TICK(); ComputeSPMV(A, p, Ap); TOCK(t3); // Ap = A*p
+	if (k == 3)
+      CarbonEnableModels();
+    ComputeSPMV(A, p, Ap); // Ap = A*p
+	if (k == 3) {
+      CarbonEnableModels();
+	  return 0;
+	}
     TICK(); ComputeDotProduct(nrow, p, Ap, pAp, t4, A.isDotProductOptimized); TOCK(t1); // alpha = p'*Ap
     alpha = rtz/pAp;
     TICK(); ComputeWAXPBY(nrow, 1.0, x, alpha, p, x, A.isWaxpbyOptimized);// x = x + alpha*p

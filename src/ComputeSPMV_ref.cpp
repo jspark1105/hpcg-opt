@@ -28,6 +28,9 @@
 #include <omp.h>
 #endif
 #include <cassert>
+#include <iostream>
+#include <stdio.h>
+#include "carbon_user.h"
 
 /*!
   Routine to compute matrix vector product y = Ax where:
@@ -63,10 +66,11 @@ int ComputeSPMV_ref( const SparseMatrix & A, Vector & x, Vector & y) {
     const double * const cur_vals = A.matrixValues[i];
     const local_int_t * const cur_inds = A.mtxIndL[i];
     const int cur_nnz = A.nonzerosInRow[i];
-
-    for (int j=0; j< cur_nnz; j++)
+    for (int j=0; j< cur_nnz; j++) {
       sum += cur_vals[j]*xv[cur_inds[j]];
+	}
     yv[i] = sum;
+
   }
   return(0);
 }

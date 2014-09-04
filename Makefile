@@ -1,7 +1,7 @@
 # -*- Makefile -*-
 
 # by default, "arch" is unknown, should be specified in the command line
-arch = UNKNOWN
+arch = GCC_OMP
 
 setup_file = setup/Make.$(arch)
 include $(setup_file)

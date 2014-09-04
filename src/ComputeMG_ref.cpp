@@ -25,7 +25,7 @@
 #include "ComputeProlongation_ref.hpp"
 #include <cassert>
 #include <iostream>
-
+#include <stdio.h>
 /*!
 
   @param[in] A the known system matrix
