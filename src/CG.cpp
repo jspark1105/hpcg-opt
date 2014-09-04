@@ -121,13 +121,13 @@ int CG(const SparseMatrix & A, CGData & data, const Vector & b, Vector & x,
       TICK(); ComputeWAXPBY (nrow, 1.0, z, beta, p, p, A.isWaxpbyOptimized);  TOCK(t2); // p = beta*p + z
     }
 
-	if (k == 3)
-      CarbonEnableModels();
+//	if (k == 3)		
+//      CarbonEnableModels();
     ComputeSPMV(A, p, Ap); // Ap = A*p
-	if (k == 3) {
-      CarbonEnableModels();
-	  return 0;
-	}
+//	if (k == 3) {
+//      CarbonEnableModels();
+//	  return 0;
+//	}
     TICK(); ComputeDotProduct(nrow, p, Ap, pAp, t4, A.isDotProductOptimized); TOCK(t1); // alpha = p'*Ap
     alpha = rtz/pAp;
     TICK(); ComputeWAXPBY(nrow, 1.0, x, alpha, p, x, A.isWaxpbyOptimized);// x = x + alpha*p
